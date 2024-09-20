@@ -3,18 +3,18 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <ArduinoJson.h>
-#include <PubSubClient.h>
 
-#define MAX_JSON_SIZE 1024
+#include "logging.h"
+#include "pins.h"
+#include "app.h"
 
 unsigned long starttime;
 
 Adafruit_BME280 bme; // I2C
 
-char *status_ip = "";
+String stateTopic;
 
-WiFiClient espclient;
-PubSubClient pubsubclient(espclient);
+App *app = new App();
 
 // credit: https://gitlab.com/diy_bloke/verydeepsleep/blob/master/VeryDeepSleep.ino
 //
@@ -66,7 +66,7 @@ void deepsleep()
 
 void wifi_connect()
 {
-  Serial.println(F("wifi_connect() - Connecting to WiFi network..."));
+  INFO("Connecting to WiFi network...");
 
   // Try to read WiFi settings from RTC memory
   bool rtcValid = false;
@@ -80,6 +80,16 @@ void wifi_connect()
     }
   }
 
+  app->setDeviceType("ESP8266 Climate Sensor");
+  app->setName(DEVICENAME);
+  app->setManufacturer("Mirko Sertic");
+  app->setVersion("v1.0");
+
+  app->setMQTTBrokerHost(MQTT_SERVER);
+  app->setMQTTBrokerUsername(MQTT_USERNAME);
+  app->setMQTTBrokerPassword(MQTT_PASSWORD);
+  app->setMQTTBrokerPort(MQTT_PORT);
+
   WiFi.forceSleepBegin();
   delay(1);
   WiFi.forceSleepWake();
@@ -87,36 +97,23 @@ void wifi_connect()
 
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
-  WiFi.setHostname(SENSORID);
+  WiFi.setHostname(app->computeTechnicalName().c_str());
 
   // Force reconnect if invalid rtc data or counter is zero
   if (rtcValid && rtcData.counter != 0)
   {
 
-    Serial.print("wifi_connect() - Channel is ");
-    Serial.println(rtcData.channel, HEX);
+    INFO_VAR("Channel is %X", rtcData.channel);
+    INFO_VAR("BSSID is %X:%X:%X:%X:%X:%X", rtcData.ap_mac[0], rtcData.ap_mac[1], rtcData.ap_mac[2], rtcData.ap_mac[3], rtcData.ap_mac[4], rtcData.ap_mac[5]);
 
-    Serial.print("wifi_connect() - BSSID is ");
-    Serial.print(rtcData.ap_mac[5], HEX);
-    Serial.print(":");
-    Serial.print(rtcData.ap_mac[4], HEX);
-    Serial.print(":");
-    Serial.print(rtcData.ap_mac[3], HEX);
-    Serial.print(":");
-    Serial.print(rtcData.ap_mac[2], HEX);
-    Serial.print(":");
-    Serial.print(rtcData.ap_mac[1], HEX);
-    Serial.print(":");
-    Serial.println(rtcData.ap_mac[0], HEX);
-
-    Serial.print(F("wifi_connect() - Connecting the fast way..."));
+    INFO("Connecting the fast way...");
     // The RTC data was good, make a quick connection
 
     WiFi.begin(WLAN_SSID, WLAN_PASSWORD, rtcData.channel, rtcData.ap_mac, true);
   }
   else
   {
-    Serial.print(F("wifi_connect() - Connecting the regular way..."));
+    INFO("Connecting the regular way...");
     // The RTC data was not valid, so make a regular connection
     WiFi.begin(WLAN_SSID, WLAN_PASSWORD);
   }
@@ -133,7 +130,7 @@ void wifi_connect()
       if (rtcValid)
       {
         Serial.println();
-        Serial.print(F("wifi_connect() - Trying regular connect..."));
+        INFO("Trying regular connect...");
         WiFi.disconnect(true);
         delay(10);
         WiFi.forceSleepBegin();
@@ -145,14 +142,14 @@ void wifi_connect()
       else
       {
         Serial.println();
-        Serial.println(F("wifi_connect() - Connection error, giving up and going to deepsleep."));
+        WARN("Connection error, giving up and going to deepsleep.");
         deepsleep();
       }
     }
     if (waitcount == 200)
     {
       Serial.println();
-      Serial.println(F("wifi_connect() - Connection error, giving up and going to deepsleep."));
+      WARN("Connection error, giving up and going to deepsleep.");
       deepsleep();
     }
     // Sensor warmup
@@ -163,11 +160,8 @@ void wifi_connect()
   Serial.println();
 
   IPAddress ip = WiFi.localIP();
-  status_ip = new char[40]();
-  sprintf(status_ip, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 
-  Serial.print(F("wifi_connect() - Connected to WiFi network. Local IP: "));
-  Serial.println(status_ip);
+  INFO_VAR("Connected to WiFi network. Local IP: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 
   const uint8_t *bssid = WiFi.BSSID();
 
@@ -175,21 +169,9 @@ void wifi_connect()
   rtcData.channel = WiFi.channel();
   memcpy(rtcData.ap_mac, bssid, 6); // Copy 6 bytes of BSSID (AP's MAC address)
 
-  Serial.print("wifi_connect() - Channel is ");
-  Serial.println(rtcData.channel, HEX);
+  INFO_VAR("Channel is %X", rtcData.channel);
 
-  Serial.print("wifi_connect() - BSSID is ");
-  Serial.print(bssid[5], HEX);
-  Serial.print(":");
-  Serial.print(bssid[4], HEX);
-  Serial.print(":");
-  Serial.print(bssid[3], HEX);
-  Serial.print(":");
-  Serial.print(bssid[2], HEX);
-  Serial.print(":");
-  Serial.print(bssid[1], HEX);
-  Serial.print(":");
-  Serial.println(bssid[0], HEX);
+  INFO_VAR("BSSID is %X:%X:%X:%X:%X:%X", bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
 
   if (rtcValid)
   {
@@ -209,9 +191,9 @@ void setup()
   starttime = millis();
 
   Serial.begin(9600);
-  Serial.println(F("setup() - Starting..."));
+  INFO("Starting...");
 
-  pinMode(A0, INPUT);
+  pinMode(GPIO_VOLTAGE_ADC, INPUT);
   // ESP.getResetReason()
 
   Wire.begin();
@@ -219,14 +201,13 @@ void setup()
   unsigned status = bme.begin(0x76, &Wire);
   if (!status)
   {
-    Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-    Serial.print("SensorID was: 0x");
-    Serial.println(bme.sensorID(), 16);
-    Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
-    Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
-    Serial.print("        ID of 0x60 represents a BME 280.\n");
-    Serial.print("        ID of 0x61 represents a BME 680.\n");
-    Serial.println("Giving up, going to deep sleep.");
+    INFO("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+    INFO_VAR("SensorID was: 0x%02X", bme.sensorID());
+    INFO("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+    INFO("   ID of 0x56-0x58 represents a BMP 280,\n");
+    INFO("        ID of 0x60 represents a BME 280.\n");
+    INFO("        ID of 0x61 represents a BME 680.\n");
+    INFO("Giving up, going to deep sleep.");
     deepsleep();
   }
 
@@ -236,84 +217,43 @@ void setup()
                   Adafruit_BME280::SAMPLING_X2, // humidity
                   Adafruit_BME280::FILTER_X2);
 
-  Serial.println("-- Default Test --");
+  INFO("-- Default Test --");
   delay(100);
 
   wifi_connect();
 
-  Serial.println(F("setup() - Initializing MQTT client"));
-  pubsubclient.setBufferSize(MAX_JSON_SIZE);
-  pubsubclient.setServer(MQTT_SERVER, MQTT_PORT);
-}
+  app->MQTT_init();
 
-void mqtt_reconnect()
-{
-  int waitcount = 0;
-  while (!pubsubclient.connected())
-  {
-    Serial.print(F("mqtt_reconnect() - Attempting MQTT connection..."));
-    // Attempt to connect
-    if (!pubsubclient.connect(SENSORID, MQTT_USERNAME, MQTT_PASSWORD))
-    {
-      Serial.print(F(" failed, rc="));
-      Serial.print(pubsubclient.state());
-      Serial.println(F(" try again..."));
+  stateTopic = app->computeTechnicalName() + "/state";
 
-      waitcount++;
-      if (waitcount > 20)
-      {
-        Serial.println("Giving up, going to deep sleep.");
-        deepsleep();
-      }
-
-      delay(100);
-    }
-    else
-    {
-      Serial.println(F(" ok"));
-    }
-  }
+  app->MQTT_announce_sensor("cycletime", "Sensor cycle time", "mdi:timelapse", "ms", -1, "{{value_json.cycletime}}", stateTopic);
+  app->MQTT_announce_sensor("temperature", "Temperature", "mdi:temperature-celsius", "°C", 2, "{{value_json.temperature}}", stateTopic);
+  app->MQTT_announce_sensor("vcc", "Battery status", "mdi:car-battery", "mV", -1, "{{value_json.vcc}}", stateTopic);
+  app->MQTT_announce_sensor("pressure", "Pressure", "", " hPA", 2, "{{value_json.pressure}}", stateTopic);
+  app->MQTT_announce_sensor("relhumidity", "Humidity", "mdi:water-percent", "%", 2, "{{value_json.humidity}}", stateTopic);
+  app->MQTT_announce_sensor("abshumidity", "Abs. Humidity", "mdi:weight-gram", "g/m³", 2, "{{value_json.abshumidity}}", stateTopic);
 }
 
 void loop()
 {
-  if (!pubsubclient.connected())
-  {
-    mqtt_reconnect();
-  }
+  app->loop();
 
-  pubsubclient.loop();
+  INFO("Taking new Measurement");
 
   bme.takeForcedMeasurement();
 
   float temp = bme.readTemperature();
   float pressure = bme.readPressure() / 100.0F;
   float humidity = bme.readHumidity();
-  float vcc = (int)(analogRead(A0) / 1024.0 * VOLTAGE_FACTOR);
+  float vcc = (int)(analogRead(GPIO_VOLTAGE_ADC) / 1024.0 * VOLTAGE_FACTOR);
 
   float abshumidity = (6.112 * exp((17.67 * temp) / (temp + 243.5)) * humidity * 2.16741) / (273.15 + temp);
 
-  Serial.print("Temperature = ");
-  Serial.print(temp);
-  Serial.println(" °C");
-
-  Serial.print("Pressure = ");
-  Serial.print(pressure);
-  Serial.println(" hPa");
-
-  Serial.print("Humidity = ");
-  Serial.print(humidity);
-  Serial.println(" %");
-
-  Serial.print("Absolute humidity = ");
-  Serial.print(abshumidity);
-  Serial.println(" g/m3");
-
-  Serial.print("Battery VCC = ");
-  Serial.print(vcc);
-  Serial.println(" mV");
-
-  Serial.println();
+  INFO_VAR("Temperature       = %f °C", temp);
+  INFO_VAR("Pressure          = %f hPa", pressure);
+  INFO_VAR("Humidity          = %f %", humidity);
+  INFO_VAR("Absolute humidity = %f g/m³", abshumidity);
+  INFO_VAR("Battery VCC       = %f mV", vcc);
 
   if (
       (temp >= -40.0 && temp <= 100.0)             // Temperature in valid range
@@ -322,32 +262,28 @@ void loop()
   )
   {
 
-    StaticJsonDocument<256> document;
+    JsonDocument document;
     document["temperature"] = temp;
     document["pressure"] = pressure;
     document["humidity"] = humidity;
     document["abshumidity"] = abshumidity;
     document["vcc"] = vcc;
-    document["localip"] = status_ip;
     document["wifichannel"] = rtcData.channel;
     document["deepsleepinseconds"] = DEELSPEEP_SECONDS;
     document["voltagefactor"] = VOLTAGE_FACTOR;
     document["cycletime"] = millis() - starttime;
 
-    char buffer[MAX_JSON_SIZE];
+    String buffer;
 
-    size_t buffersize = serializeJson(document, buffer);
-    if (pubsubclient.connected())
-    {
-      pubsubclient.publish(MQTT_DATA_TOPIC, buffer);
-    }
+    serializeJson(document, buffer);
+    app->MQTT_publish(stateTopic, buffer);
   }
   else
   {
-    Serial.println("Ignoring invalid measurements!");
+    WARN("Ignoring invalid measurements!");
   }
 
-  Serial.println("Going to deep sleep.");
+  INFO("Going to deep sleep.");
 
   deepsleep();
 }
