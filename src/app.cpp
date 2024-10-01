@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 
 #include "logging.h"
+#include "gitrevision.h"
 
 App::App()
 {
@@ -122,7 +123,7 @@ void App::MQTT_reconnect()
     }
 }
 
-void App::MQTT_announce_sensor(String notifyId, String title, String icon, String displayUnit, int decimalPrecision, String valueTemplate, String stateTopic)
+void App::MQTT_announce_sensor(String notifyId, String title, String icon, String displayUnit, int decimalPrecision, String valueTemplate, String stateTopic, String deviceClass)
 {
     String technicalName = this->computeTechnicalName();
     String objectId = technicalName + "_" + notifyId + "_sens";
@@ -136,6 +137,11 @@ void App::MQTT_announce_sensor(String notifyId, String title, String icon, Strin
     discoverypayload["state_topic"] = stateTopic;
     discoverypayload["value_template"] = valueTemplate;
     discoverypayload["name"] = title;
+
+    if (deviceClass.length() > 0)
+    {
+        discoverypayload["device_class"] = deviceClass;
+    }
     if (icon.length() > 0)
     {
         discoverypayload["icon"] = icon;
@@ -154,6 +160,7 @@ void App::MQTT_announce_sensor(String notifyId, String title, String icon, Strin
     device["model"] = this->devicetype;
     device["manufacturer"] = this->manufacturer;
     device["model_id"] = this->version;
+    device["sw_version"] = String(gitRevShort);
     device["serial_number"] = this->computeSerialNumber();
 
     JsonArray identifiers = device["identifiers"].to<JsonArray>();

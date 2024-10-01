@@ -227,11 +227,12 @@ void setup()
   stateTopic = app->computeTechnicalName() + "/state";
 
   app->MQTT_announce_sensor("cycletime", "Sensor cycle time", "mdi:timelapse", "ms", -1, "{{value_json.cycletime}}", stateTopic);
-  app->MQTT_announce_sensor("temperature", "Temperature", "mdi:temperature-celsius", "°C", 2, "{{value_json.temperature}}", stateTopic);
-  app->MQTT_announce_sensor("vcc", "Battery status", "mdi:car-battery", "mV", -1, "{{value_json.vcc}}", stateTopic);
-  app->MQTT_announce_sensor("pressure", "Pressure", "", " hPA", 2, "{{value_json.pressure}}", stateTopic);
-  app->MQTT_announce_sensor("relhumidity", "Humidity", "mdi:water-percent", "%", 2, "{{value_json.humidity}}", stateTopic);
+  app->MQTT_announce_sensor("temperature", "Temperature", "mdi:temperature-celsius", "°C", 2, "{{value_json.temperature}}", stateTopic, "TEMPERATURE");
+  app->MQTT_announce_sensor("vcc", "Battery status", "mdi:car-battery", "mV", -1, "{{value_json.vcc}}", stateTopic, "VOLTAGE");
+  app->MQTT_announce_sensor("pressure", "Pressure", "", " hPa", 2, "{{value_json.pressure}}", stateTopic, "ATMOSPHERIC_PRESSURE");
+  app->MQTT_announce_sensor("relhumidity", "Humidity", "mdi:water-percent", "%", 2, "{{value_json.humidity}}", stateTopic, "HUMIDITY");
   app->MQTT_announce_sensor("abshumidity", "Abs. Humidity", "mdi:weight-gram", "g/m³", 2, "{{value_json.abshumidity}}", stateTopic);
+  app->MQTT_announce_sensor("wifiquality", "WiFi Quality", "mdi:wifi", "dBm", -1, "{{value_json.rssi}}", stateTopic, "SIGNAL_STRENGTH");
 }
 
 void loop()
@@ -272,6 +273,7 @@ void loop()
     document["deepsleepinseconds"] = DEELSPEEP_SECONDS;
     document["voltagefactor"] = VOLTAGE_FACTOR;
     document["cycletime"] = millis() - starttime;
+    document["rssi"] = WiFi.RSSI();
 
     String buffer;
 

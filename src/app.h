@@ -55,7 +55,7 @@ public:
 
     void MQTT_reconnect();
 
-    void MQTT_announce_sensor(String notifyId, String title, String icon, String displayUnit, int decimalPrecision, String valueTemplate, String stateTopic);
+    void MQTT_announce_sensor(String notifyId, String title, String icon, String displayUnit, int decimalPrecision, String valueTemplate, String stateTopic, String deviceClass = "");
 
     void MQTT_publish(String topic, String payload);
 
