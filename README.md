@@ -1,5 +1,7 @@
 # ESP8266 Climate Sensor
 
+[![PlatformIO CI](https://github.com/mirkosertic/ESP8266Weatherstation/actions/workflows/build.yml/badge.svg)](https://github.com/mirkosertic/ESP8266Weatherstation/actions/workflows/build.yml)
+
 This project provides an ESP8266 based climate sensor with the following features:
 
 * MQTT status reporting / remote control
