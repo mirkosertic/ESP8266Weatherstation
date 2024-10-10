@@ -7,12 +7,18 @@
 #include "logging.h"
 #include "pins.h"
 #include "app.h"
+#include "homeassistant.h"
+#include "display.h"
 
 unsigned long starttime;
 
 Adafruit_BME280 bme; // I2C
 
 String stateTopic;
+
+Display *inkdisplay = new Display();
+
+Homeassistant *ha = new Homeassistant();
 
 App *app = new App();
 
@@ -189,14 +195,15 @@ void wifi_connect()
 void setup()
 {
   starttime = millis();
+  Serial.begin(115200);
 
-  Serial.begin(9600);
-  INFO("Starting...");
+  INFO_VAR("Starting. Reset reason is %s", ESP.getResetReason().c_str());
+
+  inkdisplay->init();
 
   pinMode(GPIO_VOLTAGE_ADC, INPUT);
-  // ESP.getResetReason()
 
-  Wire.begin();
+  Wire.begin(D2, D1);
 
   unsigned status = bme.begin(0x76, &Wire);
   if (!status)
@@ -252,7 +259,7 @@ void loop()
 
   INFO_VAR("Temperature       = %f °C", temp);
   INFO_VAR("Pressure          = %f hPa", pressure);
-  INFO_VAR("Humidity          = %f %", humidity);
+  INFO_VAR("Humidity          = %f %%", humidity);
   INFO_VAR("Absolute humidity = %f g/m³", abshumidity);
   INFO_VAR("Battery VCC       = %f mV", vcc);
 
@@ -285,7 +292,12 @@ void loop()
     WARN("Ignoring invalid measurements!");
   }
 
-  INFO("Going to deep sleep.");
+  SensorData sensordata = ha->fetchSensorData();
+  sensordata.indoorHumidity = humidity;
+  sensordata.indoorTemperature = temp;
 
+  inkdisplay->renderData(sensordata);
+
+  INFO("Going to deep sleep.");
   deepsleep();
 }
