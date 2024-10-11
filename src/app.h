@@ -37,6 +37,8 @@ public:
 
     void setDeviceType(String devicetype);
 
+    String computeTechnicalName(String deviceName);
+
     String computeTechnicalName();
 
     void setVersion(String version);

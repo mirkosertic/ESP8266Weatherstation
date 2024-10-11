@@ -45,12 +45,17 @@ void App::setDeviceType(String devicetype)
     this->devicetype = devicetype;
 }
 
-String App::computeTechnicalName()
+String App::computeTechnicalName(String deviceName)
 {
-    String tn = "" + this->name;
+    String tn = "" + deviceName;
     tn.replace(' ', '_');
     tn.toLowerCase();
     return tn;
+}
+
+String App::computeTechnicalName()
+{
+    return this->computeTechnicalName(this->name);
 }
 
 void App::setVersion(String version)

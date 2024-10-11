@@ -18,9 +18,12 @@ String stateTopic;
 
 Display *inkdisplay = new Display();
 
-Homeassistant *ha = new Homeassistant();
-
 App *app = new App();
+
+Homeassistant *ha = new Homeassistant(
+    String("sensor.") + app->computeTechnicalName(OUTDOOR_DEVICENAME) + "_temperature_sens",
+    String("sensor.") + app->computeTechnicalName(DEVICENAME) + "_temperature_sens",
+    String("sensor.") + app->computeTechnicalName(DEVICENAME) + "_relhumidity_sens");
 
 // credit: https://gitlab.com/diy_bloke/verydeepsleep/blob/master/VeryDeepSleep.ino
 //
@@ -197,7 +200,7 @@ void setup()
   starttime = millis();
   Serial.begin(115200);
 
-  INFO_VAR("Starting. Reset reason is %s", ESP.getResetReason().c_str());
+  // INFO_VAR("Starting. Reset reason is %s", ESP.getResetReason().c_str());
 
   inkdisplay->init();
 
@@ -209,7 +212,7 @@ void setup()
   if (!status)
   {
     INFO("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-    INFO_VAR("SensorID was: 0x%02X", bme.sensorID());
+    INFO_VAR("SensorID was: 0x%02X, status = %d", bme.sensorID(), status);
     INFO("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
     INFO("   ID of 0x56-0x58 represents a BMP 280,\n");
     INFO("        ID of 0x60 represents a BME 280.\n");
