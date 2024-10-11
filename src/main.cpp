@@ -3,12 +3,16 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <ArduinoJson.h>
+#include <time.h>
 
 #include "logging.h"
 #include "pins.h"
 #include "app.h"
 #include "homeassistant.h"
 #include "display.h"
+
+#define MY_NTP_SERVER "de.pool.ntp.org"
+#define MY_TZ "CET-1CEST,M3.5.0/02,M10.5.0/03"
 
 unsigned long starttime;
 
@@ -193,6 +197,8 @@ void wifi_connect()
 
   rtcData.crc32 = calculateCRC32(((uint8_t *)&rtcData) + 4, sizeof(rtcData) - 4);
   ESP.rtcUserMemoryWrite(0, (uint32_t *)&rtcData, sizeof(rtcData));
+
+  configTime(MY_TZ, MY_NTP_SERVER);
 }
 
 void setup()
