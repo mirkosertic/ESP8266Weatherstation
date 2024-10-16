@@ -1,3 +1,6 @@
 .pio
 .vscode
 config/secrets.ini
+kicad/weather/weather-backups/*
+kicad/weather/*.lck
+kicad/weather/*.bak
