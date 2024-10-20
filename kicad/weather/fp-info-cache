@@ -1,4 +1,4 @@
-23837902446273586
+23846549257283643
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -96739,3 +96739,38 @@ Varistor VF
 0
 2
 2
+custom_footprints
+1,54 EPD SPI DIP
+
+
+0
+8
+8
+custom_footprints
+2er DIP
+
+
+0
+2
+2
+custom_footprints
+4er DIP
+
+
+0
+2
+2
+custom_footprints
+BME280 DIP
+
+
+0
+6
+6
+custom_footprints
+LOLIN D1 MINI DIP
+
+
+0
+16
+16

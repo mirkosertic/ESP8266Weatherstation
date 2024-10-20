@@ -26,7 +26,7 @@ The KiCad 8.0 project is located in the kicad folder.
 
 Here is the wiring schematic drawing:
 
-![schematics](doc/schematics.png)
+![schematics](doc/schematics.svg)
 
 ## Manual
 

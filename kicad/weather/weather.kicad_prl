@@ -1,10 +1,26 @@
 {
   "board": {
-    "active_layer": 0,
-    "active_layer_preset": "",
+    "active_layer": 36,
+    "active_layer_preset": "All Layers",
     "auto_track_width": true,
     "hidden_netclasses": [],
-    "hidden_nets": [],
+    "hidden_nets": [
+      "/BME_I2C_SDA",
+      "3V3",
+      "/BME_I2C_SCL",
+      "GND",
+      "BAT",
+      "/DIS_SDA",
+      "/DIS_BUSY",
+      "/DIS_RST",
+      "/DIS_DC",
+      "/DIS_CS",
+      "/DIS_SCL",
+      "/D0",
+      "/RST",
+      "Net-(R1-Pad2)",
+      "/A0"
+    ],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
     "opacity": {
