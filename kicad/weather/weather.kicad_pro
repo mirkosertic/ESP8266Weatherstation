@@ -527,7 +527,7 @@
     },
     "net_colors": null,
     "netclass_assignments": {
-      "Net-(R1-Pad2)": "5V"
+      "Net-(R1-Pad2)": "BAT"
     },
     "netclass_patterns": [
       {
@@ -553,7 +553,7 @@
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
-      "svg": "",
+      "svg": "../test/",
       "vrml": ""
     },
     "page_layout_descr_file": ""

@@ -1718,6 +1718,17 @@
 		)
 		(uuid "29598879-46ec-46a3-ac67-5230c5af7447")
 	)
+	(label "3V3"
+		(at 46.99 20.32 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2a1573ba-860b-45f2-86a3-84cd860845b5")
+	)
 	(label "DIS_BUSY"
 		(at 139.7 26.67 180)
 		(fields_autoplaced yes)
@@ -1806,6 +1817,17 @@
 		)
 		(uuid "8aa8e8f5-81c6-4197-b6d3-8faca0a0fb38")
 	)
+	(label "3V3"
+		(at 152.4 20.32 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8db43021-356f-40e2-ac4b-d55910f212cf")
+	)
 	(label "DIS_CS"
 		(at 87.63 40.64 180)
 		(fields_autoplaced yes)
@@ -1838,6 +1860,17 @@
 			(justify right bottom)
 		)
 		(uuid "9dafda2c-b567-4f7b-9c4e-f4c3f0319b89")
+	)
+	(label "BAT"
+		(at 97.79 20.32 90)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9db5c6ee-5804-400a-9d09-5751830948eb")
 	)
 	(label "DIS_DC"
 		(at 139.7 31.75 180)
@@ -1917,7 +1950,7 @@
 			(justify right bottom)
 		)
 		(uuid "fa3fb10d-d89a-401e-bd7a-0804e1818af8")
-		(property "Netclass" "5V"
+		(property "Netclass" "BAT"
 			(at 36.811 67.31 0)
 			(effects
 				(font
@@ -2193,72 +2226,6 @@
 			(project ""
 				(path "/f0a87911-fb00-4a63-bfa2-860fdc3df44b"
 					(reference "R1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+BATT")
-		(at 46.99 20.32 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "75ad026b-e477-483b-9fe2-97cd6a8f9e9f")
-		(property "Reference" "#3V01"
-			(at 46.99 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "3V3"
-			(at 46.99 15.24 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 46.99 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 46.99 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 46.99 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9e272a57-d8ea-42ad-b872-df823629d772")
-		)
-		(instances
-			(project "weather"
-				(path "/f0a87911-fb00-4a63-bfa2-860fdc3df44b"
-					(reference "#3V01")
 					(unit 1)
 				)
 			)
@@ -2552,72 +2519,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+BATT")
-		(at 152.4 20.32 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "b8d588f5-2f12-499f-b3e9-85a275712fb6")
-		(property "Reference" "#3V02"
-			(at 152.4 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "3V3"
-			(at 152.4 16.002 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 152.4 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 152.4 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 152.4 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "41ad214c-a3b4-44b5-8182-5f4f71f1c9a3")
-		)
-		(instances
-			(project "weather"
-				(path "/f0a87911-fb00-4a63-bfa2-860fdc3df44b"
-					(reference "#3V02")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:PWR_FLAG")
 		(at 68.58 62.23 0)
 		(unit 1)
@@ -2880,72 +2781,6 @@
 			(project ""
 				(path "/f0a87911-fb00-4a63-bfa2-860fdc3df44b"
 					(reference "JP1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+BATT")
-		(at 97.79 20.32 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "dd9c0822-a356-4d37-b92c-32cc4ae1ddf7")
-		(property "Reference" "#BAT01"
-			(at 97.79 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "BAT"
-			(at 96.52 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 97.79 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 97.79 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 97.79 20.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "c3fd61cd-a2ad-4776-b820-15756d7d3b5a")
-		)
-		(instances
-			(project "weather"
-				(path "/f0a87911-fb00-4a63-bfa2-860fdc3df44b"
-					(reference "#BAT01")
 					(unit 1)
 				)
 			)
