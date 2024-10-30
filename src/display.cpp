@@ -32,7 +32,7 @@ void Display::init()
     // display.init(0); // default 10ms reset pulse, e.g. for bare panels with DESPI-C02
     INFO("Init done");
 
-    display.setRotation(0);
+    display.setRotation(1);
     display.refresh();
 }
 
