@@ -15,11 +15,25 @@ This project provides an ESP8266 based climate sensor with the following feature
 * BME280 climate sensor (i2c-Mode)
 * 200x200 WeAct EPD/eInk display (4-Wire SPI)
 
-## Display
+## Display & HA integration
 
 Weather data is presented the following way using the eInk-Display:
 
 ![display](doc/display_example.png)
+
+The following sensors are automatically discovered by the HA MQTT auto discovery:
+
+![haintegration](doc/haintegration.png)
+
+The device collects the following data points:
+
+- Absolute humidity (calculated)
+- Relative humidity
+- Current battery voltage
+- Air pressure
+- Temperature
+- Overall cycle time of the sensor for one measurement
+- Wifi quality
 
 ## Schematics & Prototype
 
