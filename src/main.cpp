@@ -128,8 +128,10 @@ void setup()
   INFO_VAR("CPU is running at  : %d Mhz", ESP.getCpuFreqMHz());
 
   // INFO_VAR("Starting. Reset reason is %s", ESP.getResetReason().c_str());
-
-  inkdisplay.init();
+  if (HAS_DISPLAY)
+  {
+    inkdisplay.init();
+  }
 
   pinMode(GPIO_VOLTAGE_ADC, INPUT);
 
@@ -224,22 +226,25 @@ void loop()
     deepsleep();
   }
 
-  SensorData sensordata = ha.fetchSensorData();
-  sensordata.indoorHumidity = humidity;
-  sensordata.indoorTemperature = temp;
-
-  // Disable WiFi here so save power...
-  INFO("Disconnecting from WiFi");
-  WiFi.disconnect(true);
-  delay(10);
-  WiFi.forceSleepBegin();
+  rtc.save();
 
   // This can take up to two seconds...
-  long startDisplay = millis();
-  inkdisplay.renderData(sensordata);
-  INFO_VAR("Display took %d ms", millis() - startDisplay);
+  if (HAS_DISPLAY)
+  {
+    SensorData sensordata = ha.fetchSensorData();
+    sensordata.indoorHumidity = humidity;
+    sensordata.indoorTemperature = temp;
 
-  rtc.save();
+    // Disable WiFi here so save power...
+    INFO("Disconnecting from WiFi");
+    WiFi.disconnect(true);
+    delay(10);
+    WiFi.forceSleepBegin();
+
+    long startDisplay = millis();
+    inkdisplay.renderData(sensordata);
+    INFO_VAR("Display took %d ms", millis() - startDisplay);
+  }
 
   INFO("Going to deep sleep.");
   deepsleep();
