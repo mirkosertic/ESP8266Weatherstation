@@ -151,13 +151,10 @@ void setup()
   }
 
   bme.setSampling(Adafruit_BME280::MODE_FORCED,
-                  Adafruit_BME280::SAMPLING_X2, // temperature
-                  Adafruit_BME280::SAMPLING_X2, // pressure
-                  Adafruit_BME280::SAMPLING_X2, // humidity
-                  Adafruit_BME280::FILTER_X2);
-
-  INFO("-- Default Test --");
-  delay(100);
+                  Adafruit_BME280::SAMPLING_X4, // temperature
+                  Adafruit_BME280::SAMPLING_X4, // pressure
+                  Adafruit_BME280::SAMPLING_X4, // humidity
+                  Adafruit_BME280::FILTER_X4);
 
   wifi_connect();
 
@@ -180,7 +177,11 @@ void loop()
 
   INFO("Taking new Measurement");
 
-  bme.takeForcedMeasurement();
+  for (int i = 0; i < 10; i++)
+  {
+    bme.takeForcedMeasurement();
+    delay(10);
+  }
 
   float temp = bme.readTemperature();
   float pressure = bme.readPressure() / 100.0F;
