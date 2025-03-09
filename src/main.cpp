@@ -13,6 +13,9 @@
 #include "rtc.h"
 
 unsigned long starttime;
+long timeToDisplayInit;
+long timeToWifiConnect;
+long timeToWMQTTInit;
 
 Adafruit_BME280 bme; // I2C
 
@@ -28,6 +31,8 @@ Homeassistant ha = Homeassistant(
     String("sensor.") + app.computeTechnicalName(OUTDOOR_DEVICENAME) + "_temperature_sens",
     String("sensor.") + app.computeTechnicalName(DEVICENAME) + "_temperature_sens",
     String("sensor.") + app.computeTechnicalName(DEVICENAME) + "_relhumidity_sens");
+
+struct rst_info *rtc_info = system_get_rst_info();
 
 void deepsleep()
 {
@@ -127,11 +132,12 @@ void setup()
   INFO_VAR("Chip id is         : %d", ESP.getChipId());
   INFO_VAR("CPU is running at  : %d Mhz", ESP.getCpuFreqMHz());
 
-  // INFO_VAR("Starting. Reset reason is %s", ESP.getResetReason().c_str());
   if (HAS_DISPLAY)
   {
-    inkdisplay.init();
+    inkdisplay.init(rtc_info->reason == REASON_DEEP_SLEEP_AWAKE);
   }
+
+  timeToDisplayInit = millis() - starttime;
 
   pinMode(GPIO_VOLTAGE_ADC, INPUT);
 
@@ -158,6 +164,8 @@ void setup()
 
   wifi_connect();
 
+  timeToWifiConnect = millis() - starttime;
+
   app.MQTT_init();
 
   stateTopic = app.computeTechnicalName() + "/state";
@@ -165,10 +173,12 @@ void setup()
   app.MQTT_announce_sensor("cycletime", "Sensor cycle time", "mdi:timelapse", "ms", -1, "{{value_json.cycletime}}", stateTopic);
   app.MQTT_announce_sensor("temperature", "Temperature", "mdi:temperature-celsius", "°C", 2, "{{value_json.temperature}}", stateTopic, "TEMPERATURE");
   app.MQTT_announce_sensor("vcc", "Battery status", "mdi:car-battery", "mV", -1, "{{value_json.vcc}}", stateTopic, "VOLTAGE");
-  app.MQTT_announce_sensor("pressure", "Pressure", "", " hPa", 2, "{{value_json.pressure}}", stateTopic, "ATMOSPHERIC_PRESSURE");
+  app.MQTT_announce_sensor("pressure", "Pressure", "", "hPa", 2, "{{value_json.pressure}}", stateTopic, "ATMOSPHERIC_PRESSURE");
   app.MQTT_announce_sensor("relhumidity", "Humidity", "mdi:water-percent", "%", 2, "{{value_json.humidity}}", stateTopic, "HUMIDITY");
   app.MQTT_announce_sensor("abshumidity", "Abs. Humidity", "mdi:weight-gram", "g/m³", 2, "{{value_json.abshumidity}}", stateTopic);
   app.MQTT_announce_sensor("wifiquality", "WiFi Quality", "mdi:wifi", "dBm", -1, "{{value_json.rssi}}", stateTopic, "SIGNAL_STRENGTH");
+
+  timeToWMQTTInit = millis() - starttime;
 }
 
 void loop()
@@ -180,7 +190,7 @@ void loop()
   for (int i = 0; i < 10; i++)
   {
     bme.takeForcedMeasurement();
-    delay(10);
+    delay(5);
   }
 
   float temp = bme.readTemperature();
@@ -214,6 +224,10 @@ void loop()
     document["voltagefactor"] = VOLTAGE_FACTOR;
     document["cycletime"] = millis() - starttime;
     document["rssi"] = WiFi.RSSI();
+    document["timeToDisplayInit"] = timeToDisplayInit;
+    document["timeToWifiConnect"] = timeToWifiConnect;
+    document["timeToWMQTTInit"] = timeToWMQTTInit;
+    document["rstreason"] = rtc_info->reason;
 
     String buffer;
 

@@ -13,7 +13,7 @@ private:
 public:
     Display();
 
-    void init();
+    void init(bool fromdeepsleep = false);
 
     void renderData(SensorData sensorData);
 };

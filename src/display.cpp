@@ -25,15 +25,26 @@ Display::Display()
 {
 }
 
-void Display::init()
+void Display::init(bool fromdeepsleep)
 {
-    INFO("Init");
-    display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
-    // display.init(0); // default 10ms reset pulse, e.g. for bare panels with DESPI-C02
+
+    if (fromdeepsleep) {
+        INFO("Init from deep sleep");        
+        display.init(115200, false, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
+    } else {
+        INFO("Regular init");
+        display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse        
+    }
     INFO("Init done");
 
     display.setRotation(1);
+    INFO("Refresh");
     display.refresh();
+    if (fromdeepsleep) {
+        INFO("Refresh from deep sleep");
+    } else {
+        INFO("Refresh done");
+    }
 }
 
 void Display::renderRightAligned(String text, int x, int y)
