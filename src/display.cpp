@@ -57,7 +57,7 @@ void Display::renderRightAligned(String text, int x, int y)
     display.print(text);
 }
 
-void Display::renderData(SensorData sensorData)
+void Display::renderData(SensorData sensorData, bool fromdeepsleep)
 {
     display.setFont(&FreeMonoBold24pt7b);
     display.setTextColor(GxEPD_BLACK);
@@ -202,7 +202,7 @@ void Display::renderData(SensorData sensorData)
     display.print(sensorData.latestUpdateTime);
 
     INFO("Before display");
-    display.display(false);
+    display.display(fromdeepsleep);
     INFO("After display");
 
     display.hibernate();

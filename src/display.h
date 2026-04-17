@@ -15,7 +15,7 @@ public:
 
     void init(bool fromdeepsleep = false);
 
-    void renderData(SensorData sensorData);
+    void renderData(SensorData sensorData, bool fromdeepsleep = false);
 };
 
 #endif

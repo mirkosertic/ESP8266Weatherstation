@@ -65,6 +65,7 @@ void wifi_connect()
 
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
+  WiFi.setPhyMode(WIFI_PHY_MODE_11N);
   WiFi.setHostname(app.computeTechnicalName().c_str());
 
   // Try to reconnect with known BSSID and Channel
@@ -112,6 +113,7 @@ void wifi_connect()
     delay(100);
   }
 
+  WiFi.persistent(true);
   Serial.println();
 
   IPAddress ip = WiFi.localIP();
@@ -257,7 +259,7 @@ void loop()
     WiFi.forceSleepBegin();
 
     long startDisplay = millis();
-    inkdisplay.renderData(sensordata);
+    inkdisplay.renderData(sensordata, false);
     INFO_VAR("Display took %d ms", millis() - startDisplay);
   }
 
