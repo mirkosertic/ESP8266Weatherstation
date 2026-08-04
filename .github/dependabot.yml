@@ -9,6 +9,8 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    labels:
+      - "dependencies"
   # GitHub Actions dependencies (actions/checkout, actions/cache, etc.)
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -18,5 +20,3 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "ci"
-
